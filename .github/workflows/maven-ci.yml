@@ -1,0 +1,55 @@
+name: "Maven ci"
+run-name: Build application
+
+on:
+  workflow_call:
+    inputs:
+      maven_goals:
+        type: string
+        required: false
+        default: clean deploy
+
+jobs:
+  build:
+    name: "Build"
+    runs-on: "ubuntu-latest"
+    
+    steps:
+    - name: "Setup Maven"
+      uses: s4u/setup-maven-action@v1.18.0
+      with:
+        settings-servers: |
+          [{
+            "id": "central",
+            "username": "${{ secrets.ARTIFACTORY_USERNAME }}",
+            "password": "${{ secrets.ARTIFACTORY_PASSWORD }}"
+          },{
+            "id": "snapshots",
+            "username": "${{ secrets.ARTIFACTORY_USERNAME }}",
+            "password": "${{ secrets.ARTIFACTORY_PASSWORD }}"
+          }]
+        settings-repositories: |
+          [{
+            "id":"central",
+            "name":"ocanema-libs-release",
+            "url":"https://sorint.jfrog.io/artifactory/ocanema-libs-release",
+            "snapshots":{"enabled":false}
+          },{
+            "id":"snapshots",
+            "name":"ocanema-libs-snapshots",
+            "url":"https://sorint.jfrog.io/artifactory/ocanema-libs-snapshot",
+            "snapshots":{"enabled":true}
+          }]
+        settings-pluginRepositories: |
+          [{
+            "id":"central",
+            "name":"ocanema-libs-release",
+            "url":"https://sorint.jfrog.io/artifactory/ocanema-libs-release",
+            "snapshots":{"enabled":false}
+          },{
+            "id":"snapshots",
+            "name":"ocanema-libs-snapshots",
+            "url":"https://sorint.jfrog.io/artifactory/ocanema-libs-snapshot",
+            "snapshots":{"enabled":true}
+          }]
+    - run: mvn deploy
