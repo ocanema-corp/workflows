@@ -1,5 +1,4 @@
-name: "Maven ci"
-run-name: Build application
+name: "Maven CI"
 
 on:
   workflow_call:
@@ -52,4 +51,4 @@ jobs:
             "url":"https://sorint.jfrog.io/artifactory/ocanema-libs-snapshot",
             "snapshots":{"enabled":true}
           }]
-    - run: mvn deploy
+    - run: mvn ${{ inputs.maven_goals }}
